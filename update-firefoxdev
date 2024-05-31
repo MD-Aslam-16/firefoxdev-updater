@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Check the program run with 'sudo'
+if [ "$UID" -ne 0 ]; then
+    echo "Permission Denied: Please try with 'sudo'"
+    exit 1
+fi
+
+# Current user
+user=$(awk -F: '$3 == 1000 { print $1 }' /etc/passwd)
+
+# Firefox developer installation Directory
+firefoxDir="/opt/firefox"
+
+# API to get latest firefox developer version
+firefoxLatestData="https://product-details.mozilla.org/1.0/firefox_versions.json"
+
+# # Get latest firefox developer version
+latestFirefoxVersion=$(curl -s "$firefoxLatestData" | grep "FIREFOX_DEVEDITION" | awk -F'"' '{print $4}')
+
+# # Download destination
+downloadFirefoxDestination="/tmp/firefox-$latestFirefoxVersion.tar.bz2"
+
+# Get current version of firefox developer intalled
+currentFirefoxVersion=$(sudo -u $user $firefoxDir/firefox -v | awk '{print $3}')
+
+# Printing version information
+echo "Current version of Firefox Developer Edition ↩️: $currentFirefoxVersion"
+echo "Recent release version of Firefox Developer Edition ⏫: $latestFirefoxVersion"
+
+# 
+if [[ $currentFirefoxVersion != $latestFirefoxVersion ]]; 
+then
+    echo "Updating Firefox Developer Edition 🔃"
+    curl -s "https://download-installer.cdn.mozilla.net/pub/devedition/releases/$latestFirefoxVersion/linux-x86_64/en-US/firefox-$latestFirefoxVersion.tar.bz2" -o $downloadFirefoxDestination
+    tar -xjf $downloadFirefoxDestination --directory /tmp
+    cp -r /tmp/firefox/* /opt/firefox
+    echo " Done updating 👍 "
+else
+    echo " ✌️  Already upto date 👏 "
+fi
