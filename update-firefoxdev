@@ -28,7 +28,7 @@ currentFirefoxVersion=$(sudo -u $user $firefoxDir/firefox -v | awk '{print $3}')
 echo "Current version of Firefox Developer Edition ↩️: $currentFirefoxVersion"
 echo "Recent release version of Firefox Developer Edition ⏫: $latestFirefoxVersion"
 
-# 
+# If current version is not equal to latest version then download and install latest version
 if [[ $currentFirefoxVersion != $latestFirefoxVersion ]]; 
 then
     echo "Updating Firefox Developer Edition 🔃"
